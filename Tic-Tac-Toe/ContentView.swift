@@ -44,6 +44,10 @@ struct ContentView: View {
                                 print("Human Wins")
                             }
                             
+                            if checkForDraw(in: moves) {
+                                print("Draw!")
+                            }
+                            
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                 let computerPosition = determineComputerMovePosition(in: moves)
                                 moves[computerPosition] = Move(player: .computer, boardIndex: computerPosition)
@@ -51,6 +55,10 @@ struct ContentView: View {
                                 
                                 if checkWinCondition(for: .computer, in: moves) {
                                     print("Computer Wins")
+                                }
+                                
+                                if checkForDraw(in: moves) {
+                                    print("Draw!")
                                 }
                             }
                         }
@@ -62,59 +70,63 @@ struct ContentView: View {
             .padding()
         }
     }
-    
-    func isSquareOccupied(in moves: [Move?], forIndex index: Int) -> Bool {
-        return moves.contains(where: { $0?.boardIndex == index })
-    }
-    
-    func determineComputerMovePosition(in moves: [Move?]) -> Int {
-        var movePosition = Int.random(in: 0..<9)
         
-        while isSquareOccupied(in: moves, forIndex: movePosition) {
-            movePosition = Int.random(in: 0..<9)
+        
+        func isSquareOccupied(in moves: [Move?], forIndex index: Int) -> Bool {
+            return moves.contains(where: { $0?.boardIndex == index })
         }
         
-        return movePosition
+        func determineComputerMovePosition(in moves: [Move?]) -> Int {
+            var movePosition = Int.random(in: 0..<9)
+            
+            while isSquareOccupied(in: moves, forIndex: movePosition) {
+                movePosition = Int.random(in: 0..<9)
+            }
+            
+            return movePosition
+        }
+        
+        func checkWinCondition(for player: Player, in moves: [Move?]) -> Bool {
+            let winPatterns: Set<Set<Int>> = [
+                [0, 1, 2],
+                [3, 4, 5],
+                [6, 7, 8],
+                [0, 3 , 6],
+                [1, 4, 7],
+                [2, 5, 8],
+                [0, 4, 8],
+                [2, 4, 6]
+            ]
+            
+            let playerMoves = moves.compactMap { $0 }.filter { $0.player == player }
+            let playerPositions = Set(playerMoves.map { $0.boardIndex })
+            
+            for pattern in winPatterns where pattern.isSubset(of: playerPositions ) { return true }
+            
+            return false
+        }
+        
+        func checkForDraw(in moves: [Move?]) -> Bool {
+            return moves.compactMap { $0 }.count == 9
+        }
     }
     
-    func checkWinCondition(for player: Player, in moves: [Move?]) -> Bool {
-        let winPatterns: Set<Set<Int>> = [
-            [0, 1, 2],
-            [3, 4, 5],
-            [6, 7, 8],
-            [0, 3 , 6],
-            [1, 4, 7],
-            [2, 5, 8],
-            [0, 4, 8],
-            [2, 4, 6]
-        ]
-        
-        let playerMoves = moves.compactMap { $0 }.filter { $0.player == player }
-        let playerPositions = Set(playerMoves.map { $0.boardIndex })
-        
-        for pattern in winPatterns where pattern.isSubset(of: playerPositions ) { return true }
-        
-        return false
+    enum Player {
+        case human, computer
     }
-}
-
-
-enum Player {
-    case human, computer
-}
-
-struct Move  {
-    let player: Player
-    let boardIndex: Int
     
-    var indicator: String {
-        return player == .human ? "xmark" : "circle"
+    struct Move  {
+        let player: Player
+        let boardIndex: Int
+        
+        var indicator: String {
+            return player == .human ? "xmark" : "circle"
+        }
     }
-}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-            .preferredColorScheme(.dark)
+    
+    struct ContentView_Previews: PreviewProvider {
+        static var previews: some View {
+            ContentView()
+                .preferredColorScheme(.dark)
+        }
     }
-}
