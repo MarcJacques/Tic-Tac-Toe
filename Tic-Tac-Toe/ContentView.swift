@@ -27,14 +27,14 @@ struct ContentView: View {
                     ForEach(0..<9) {i in
                         ZStack {
                             Circle()
-                                .foregroundColor(.cyan).opacity(0.5)
+                                .foregroundColor(.purple).opacity(0.5)
                                 .frame(width: geometry.size.width/3 - 15,
                                        height: geometry.size.width/3 - 15)
                             
                             Image(systemName: moves[i]?.indicator ?? "")
                                 .resizable()
                                 .frame(width: 40, height: 40)
-                                .foregroundColor(.white)
+                                .foregroundColor(.yellow)
                         }
                         .onTapGesture {
                             if isSquareOccupied(in: moves, forIndex: i) { return }
