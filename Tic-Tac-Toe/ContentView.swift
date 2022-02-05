@@ -131,7 +131,7 @@ struct ContentView: View {
             
 //            If AI can't block, then take middle square
             let centerSquare = 4
-            if isSquareOccupied(in: moves, forIndex: centerSquare) {
+            if !isSquareOccupied(in: moves, forIndex: centerSquare) {
                 return centerSquare
             }
             
